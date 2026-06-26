@@ -1,0 +1,371 @@
+{% extends "base.html" %} {% block title %}New Exercise{% endblock %} {% block
+content %}
+<a href="/exercises" class="breadcrumb">Back to Exercise Bank</a>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">New Exercise</h1>
+    <p class="page-subtitle">Add a new exercise to the bank</p>
+  </div>
+</div>
+
+<div class="card" style="max-width: 640px">
+  <div class="card-body">
+    <form id="exercise-form">
+      <label class="form-label">Title <span class="required">*</span></label>
+      <input class="form-input" type="text" id="title" required />
+
+      <label class="form-label">Category <span class="required">*</span></label>
+      <select class="form-input" id="category" required>
+        {% for cat in categories %}
+        <option value="{{ cat }}">{{ cat|capitalize }}</option>
+        {% endfor %}
+      </select>
+
+      <label class="form-label"
+        >Exercise Type <span class="required">*</span></label
+      >
+      <select class="form-input" id="exercise_type" required>
+        {% for t in exercise_types %}
+        <option value="{{ t }}">{{ t.replace('_', ' ')|capitalize }}</option>
+        {% endfor %}
+      </select>
+
+      <label class="form-label"
+        >Instructions <span class="required">*</span></label
+      >
+      <input
+        class="form-input"
+        type="text"
+        id="instructions"
+        required
+        placeholder="e.g. Choose the correct option to complete the sentence."
+      />
+
+      <label class="form-label">Difficulty</label>
+      <select class="form-input" id="difficulty">
+        <option value="easy">Easy</option>
+        <option value="medium" selected>Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+
+      <div class="divider-label">Exercise Content</div>
+
+      <!-- multiple_choice -->
+      <div class="content-fields" data-type="multiple_choice">
+        <label class="form-label"
+          >Question <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="mc_question"
+          placeholder="She _____ to the gym every Monday."
+        />
+        <label class="form-label"
+          >Options (A–D) <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="mc_option_0"
+          placeholder="A) go"
+          style="margin-bottom: 0.4rem"
+        />
+        <input
+          class="form-input"
+          type="text"
+          id="mc_option_1"
+          placeholder="B) goes"
+          style="margin-bottom: 0.4rem"
+        />
+        <input
+          class="form-input"
+          type="text"
+          id="mc_option_2"
+          placeholder="C) is going"
+          style="margin-bottom: 0.4rem"
+        />
+        <input
+          class="form-input"
+          type="text"
+          id="mc_option_3"
+          placeholder="D) has gone"
+        />
+        <label class="form-label"
+          >Correct Answer <span class="required">*</span></label
+        >
+        <select class="form-input" id="mc_answer">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+        </select>
+      </div>
+
+      <!-- fill_in_the_blank -->
+      <div class="content-fields" data-type="fill_in_the_blank">
+        <label class="form-label"
+          >Sentence (use _______ for blanks)
+          <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="fib_sentence"
+          placeholder="I saw _______ elephant at _______ zoo yesterday."
+        />
+        <label class="form-label"
+          >Answers, in order (comma-separated)
+          <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="fib_answers"
+          placeholder="an, the"
+        />
+      </div>
+
+      <!-- error_correction -->
+      <div class="content-fields" data-type="error_correction">
+        <label class="form-label"
+          >Sentence (with the error) <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="ec_sentence"
+          placeholder="The news are very shocking today."
+        />
+        <label class="form-label">Error <span class="required">*</span></label>
+        <input class="form-input" type="text" id="ec_error" placeholder="are" />
+        <label class="form-label"
+          >Correction <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="ec_correction"
+          placeholder="is"
+        />
+      </div>
+
+      <!-- sentence_transformation -->
+      <div class="content-fields" data-type="sentence_transformation">
+        <label class="form-label"
+          >Original Sentence <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="st_original"
+          placeholder="The chef cooked the meal."
+        />
+        <label class="form-label">Start with / Keyword (optional)</label>
+        <input
+          class="form-input"
+          type="text"
+          id="st_keyword"
+          placeholder="was"
+        />
+        <label class="form-label">Answer <span class="required">*</span></label>
+        <input
+          class="form-input"
+          type="text"
+          id="st_answer"
+          placeholder="The meal was cooked by the chef."
+        />
+      </div>
+
+      <!-- essay -->
+      <div class="content-fields" data-type="essay">
+        <label class="form-label">Prompt <span class="required">*</span></label>
+        <input
+          class="form-input"
+          type="text"
+          id="essay_prompt"
+          placeholder="Discuss both views and give your own opinion."
+        />
+        <label class="form-label">Min words</label>
+        <input class="form-input" type="number" id="essay_min" value="150" />
+        <label class="form-label">Max words</label>
+        <input class="form-input" type="number" id="essay_max" value="200" />
+        <label class="form-label">Sample answer (optional)</label>
+        <input
+          class="form-input"
+          type="text"
+          id="essay_sample"
+          placeholder="Used as a grading reference."
+        />
+      </div>
+
+      <!-- fallback: raw JSON for not-yet-defined types -->
+      <div class="content-fields" data-type="word_matching">
+        <label class="form-label"
+          >Content (raw JSON) <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="raw_json_word_matching"
+          placeholder='{"pairs": [...]}'
+        />
+      </div>
+      <div class="content-fields" data-type="definition_match">
+        <label class="form-label"
+          >Content (raw JSON) <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="raw_json_definition_match"
+          placeholder='{"pairs": [...]}'
+        />
+      </div>
+      <div class="content-fields" data-type="comprehension_questions">
+        <label class="form-label"
+          >Content (raw JSON) <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="raw_json_comprehension_questions"
+          placeholder='{"passage": "...", "questions": [...]}'
+        />
+      </div>
+      <div class="content-fields" data-type="true_false">
+        <label class="form-label"
+          >Content (raw JSON) <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="raw_json_true_false"
+          placeholder='{"statements": [...]}'
+        />
+      </div>
+      <div class="content-fields" data-type="guided_writing">
+        <label class="form-label"
+          >Content (raw JSON) <span class="required">*</span></label
+        >
+        <input
+          class="form-input"
+          type="text"
+          id="raw_json_guided_writing"
+          placeholder='{"template": "...", "blanks": [...]}'
+        />
+      </div>
+
+      <div class="form-error hidden" id="form-error"></div>
+
+      <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem">
+        <button type="submit" class="btn btn-primary">Save Exercise</button>
+        <a href="/exercises" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function showFieldsFor(type) {
+    document.querySelectorAll('.content-fields').forEach((div) => {
+      div.style.display = div.dataset.type === type ? '' : 'none';
+    });
+  }
+  const typeSelect = document.getElementById('exercise_type');
+  showFieldsFor(typeSelect.value);
+  typeSelect.addEventListener('change', () => showFieldsFor(typeSelect.value));
+
+  function buildContent(type) {
+    switch (type) {
+      case 'multiple_choice':
+        return {
+          question: document.getElementById('mc_question').value,
+          options: [0, 1, 2, 3].map(
+            (i) => document.getElementById(`mc_option_${i}`).value
+          ),
+          answer: document.getElementById('mc_answer').value
+        };
+      case 'fill_in_the_blank':
+        return {
+          sentence: document.getElementById('fib_sentence').value,
+          answers: document
+            .getElementById('fib_answers')
+            .value.split(',')
+            .map((a) => a.trim())
+            .filter(Boolean)
+        };
+      case 'error_correction':
+        return {
+          sentence: document.getElementById('ec_sentence').value,
+          error: document.getElementById('ec_error').value,
+          correction: document.getElementById('ec_correction').value
+        };
+      case 'sentence_transformation':
+        return {
+          original: document.getElementById('st_original').value,
+          keyword: document.getElementById('st_keyword').value || undefined,
+          answer: document.getElementById('st_answer').value
+        };
+      case 'essay':
+        return {
+          prompt: document.getElementById('essay_prompt').value,
+          min_words:
+            parseInt(document.getElementById('essay_min').value) || undefined,
+          max_words:
+            parseInt(document.getElementById('essay_max').value) || undefined,
+          sample_answer:
+            document.getElementById('essay_sample').value || undefined
+        };
+      default: {
+        const raw = document.getElementById(`raw_json_${type}`).value;
+        return JSON.parse(raw); // throws if invalid — caught below
+      }
+    }
+  }
+
+  document
+    .getElementById('exercise-form')
+    .addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errorBox = document.getElementById('form-error');
+      errorBox.classList.add('hidden');
+
+      const type = typeSelect.value;
+      let content;
+      try {
+        content = buildContent(type);
+      } catch (err) {
+        errorBox.textContent = 'Invalid JSON in content field.';
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      const payload = {
+        title: document.getElementById('title').value,
+        category: document.getElementById('category').value,
+        exercise_type: type,
+        instructions: document.getElementById('instructions').value,
+        difficulty: document.getElementById('difficulty').value,
+        content
+      };
+
+      const res = await fetch('/api/exercises/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        window.location.href = '/exercises';
+      } else {
+        const err = await res.json().catch(() => ({}));
+        errorBox.textContent = err.detail
+          ? JSON.stringify(err.detail)
+          : 'Error saving exercise.';
+        errorBox.classList.remove('hidden');
+      }
+    });
+</script>
+{% endblock %}

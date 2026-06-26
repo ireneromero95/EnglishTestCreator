@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block title %}New Exam{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">New Exam</h1>
+    <p class="page-subtitle">Build manually or let the system generate it for you</p>
+  </div>
+</div>
+
+<!-- Tab switcher -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="manual">✏️ Build Manually</button>
+  <button class="tab-btn" data-tab="auto">⚡ Auto-Generate</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: MANUAL
+══════════════════════════════════════════════════════════════ -->
+<div id="tab-manual" class="tab-panel">
+  <div class="two-col">
+
+    <!-- Left: Exam info + selected exercises -->
+    <div class="col-main">
+      <div class="card">
+        <div class="card-header">Exam Details</div>
+        <div class="card-body">
+          <label class="form-label">Title <span class="required">*</span></label>
+          <input id="m-title" type="text" class="form-input" placeholder="e.g. Unit 3 Grammar Test">
+          <label class="form-label">Level</label>
+          <select id="m-level" class="form-input">
+            <option value="">— select level —</option>
+            <option>A1</option><option>A2</option><option>B1</option>
+            <option>B2</option><option>C1</option><option>C2</option>
+          </select>
+          <label class="form-label">Description</label>
+          <textarea id="m-desc" class="form-input" rows="2" placeholder="Optional note for students"></textarea>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1rem">
+        <div class="card-header">
+          Selected Exercises
+          <span id="selected-count" class="badge-count">0</span>
+        </div>
+        <div id="selected-list" class="selected-list">
+          <div class="empty-selected">
+            Click exercises on the right to add them →
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-primary" onclick="submitManual()">Create Exam</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Exercise picker -->
+    <div class="col-side">
+      <div class="card">
+        <div class="card-header">Exercise Bank</div>
+        <div class="card-body" style="padding-bottom:0">
+          <!-- Category filter tabs -->
+          <div class="cat-filter">
+            <button class="cat-btn active" data-cat="all">All</button>
+            {% for cat in categories %}
+            <button class="cat-btn" data-cat="{{ cat }}">{{ cat|capitalize }}</button>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div id="exercise-picker" class="exercise-picker">
+          {% for ex in exercises %}
+          <div class="picker-item" data-id="{{ ex.id }}" data-cat="{{ ex.category }}"
+               onclick="toggleExercise(this)">
+            <div class="picker-item-header">
+              <span class="badge badge-{{ ex.category }}">{{ ex.category }}</span>
+              <span class="badge badge-type">{{ ex.exercise_type.replace('_',' ') }}</span>
+              <span class="difficulty-dot diff-{{ ex.difficulty }}" title="{{ ex.difficulty }}">●</span>
+            </div>
+            <div class="picker-item-title">{{ ex.title }}</div>
+            <div class="picker-item-instr">{{ ex.instructions[:80] }}{% if ex.instructions|length > 80 %}…{% endif %}</div>
+            <div class="picker-check">✓</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     TAB: AUTO-GENERATE
+══════════════════════════════════════════════════════════════ -->
+<div id="tab-auto" class="tab-panel hidden">
+  <div class="card" style="max-width:560px;margin:0 auto">
+    <div class="card-header">⚡ Auto-Generate Exam</div>
+    <div class="card-body">
+
+      <label class="form-label">Title <span class="required">*</span></label>
+      <input id="a-title" type="text" class="form-input" placeholder="e.g. Mixed Skills Test – B1">
+
+      <label class="form-label">Level</label>
+      <select id="a-level" class="form-input">
+        <option value="">— select level —</option>
+        <option>A1</option><option>A2</option><option>B1</option>
+        <option>B2</option><option>C1</option><option>C2</option>
+      </select>
+
+      <label class="form-label">Description</label>
+      <textarea id="a-desc" class="form-input" rows="2" placeholder="Optional"></textarea>
+
+      <div class="divider-label">Number of exercises per category</div>
+
+      <div class="counter-grid">
+        {% for cat in categories %}
+        <div class="counter-row">
+          <label class="counter-label">
+            <span class="badge badge-{{ cat }}">{{ cat|capitalize }}</span>
+          </label>
+          <div class="counter-controls">
+            <button class="counter-btn" onclick="adjustCounter('{{ cat }}', -1)">−</button>
+            <span id="count-{{ cat }}" class="counter-val">0</span>
+            <button class="counter-btn" onclick="adjustCounter('{{ cat }}', 1)">+</button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div id="auto-error" class="form-error hidden"></div>
+
+      <button class="btn btn-primary btn-full" onclick="submitAuto()">
+        ⚡ Generate Exam
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Tab switching ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+  });
+});
+
+// ── Category filter ───────────────────────────────────────────────────────────
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const cat = btn.dataset.cat;
+    document.querySelectorAll('.picker-item').forEach(item => {
+      item.style.display = (cat === 'all' || item.dataset.cat === cat) ? '' : 'none';
+    });
+  });
+});
+
+// ── Manual: exercise selection ────────────────────────────────────────────────
+const selected = new Map(); // id → {id, title, category}
+
+function toggleExercise(el) {
+  const id = parseInt(el.dataset.id);
+  const title = el.querySelector('.picker-item-title').textContent;
+  const cat = el.dataset.cat;
+
+  if (selected.has(id)) {
+    selected.delete(id);
+    el.classList.remove('selected');
+  } else {
+    selected.set(id, { id, title, cat });
+    el.classList.add('selected');
+  }
+  renderSelected();
+}
+
+function renderSelected() {
+  const list = document.getElementById('selected-list');
+  document.getElementById('selected-count').textContent = selected.size;
+
+  if (selected.size === 0) {
+    list.innerHTML = '<div class="empty-selected">Click exercises on the right to add them →</div>';
+    return;
+  }
+
+  list.innerHTML = [...selected.values()].map((ex, i) => `
+    <div class="selected-item">
+      <span class="selected-num">${i + 1}</span>
+      <span class="selected-badge badge-${ex.cat}">${ex.cat}</span>
+      <span class="selected-title">${ex.title}</span>
+      <button class="remove-btn" onclick="removeSelected(${ex.id})">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeSelected(id) {
+  selected.delete(id);
+  document.querySelector(`.picker-item[data-id="${id}"]`)?.classList.remove('selected');
+  renderSelected();
+}
+
+async function submitManual() {
+  const title = document.getElementById('m-title').value.trim();
+  if (!title) { alert('Please enter an exam title.'); return; }
+  if (selected.size === 0) { alert('Please select at least one exercise.'); return; }
+
+  // 1. Create exam
+  const examRes = await fetch('/api/exams/', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      title,
+      level: document.getElementById('m-level').value || null,
+      description: document.getElementById('m-desc').value || null,
+    })
+  });
+  const exam = await examRes.json();
+
+  // 2. Add exercises in order
+  for (const [idx, ex] of [...selected.values()].entries()) {
+    await fetch(`/api/exams/${exam.id}/exercises`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ exercise_id: ex.id, order: idx })
+    });
+  }
+
+  window.location.href = `/exams/${exam.id}`;
+}
+
+// ── Auto-generate ─────────────────────────────────────────────────────────────
+const counters = { grammar: 0, vocabulary: 0, reading: 0, writing: 0 };
+
+function adjustCounter(cat, delta) {
+  counters[cat] = Math.max(0, counters[cat] + delta);
+  document.getElementById('count-' + cat).textContent = counters[cat];
+}
+
+async function submitAuto() {
+  const title = document.getElementById('a-title').value.trim();
+  const errEl = document.getElementById('auto-error');
+  errEl.classList.add('hidden');
+
+  if (!title) { alert('Please enter a title.'); return; }
+  const total = Object.values(counters).reduce((a, b) => a + b, 0);
+  if (total === 0) { alert('Set at least one exercise count.'); return; }
+
+  const payload = {
+    title,
+    level: document.getElementById('a-level').value || null,
+    description: document.getElementById('a-desc').value || null,
+    ...counters
+  };
+
+  const res = await fetch('/api/exams/generate', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  });
+
+  if (res.ok) {
+    const exam = await res.json();
+    window.location.href = `/exams/${exam.id}`;
+  } else {
+    const err = await res.json();
+    errEl.textContent = err.detail || 'Error generating exam.';
+    errEl.classList.remove('hidden');
+  }
+}
+</script>
+{% endblock %}

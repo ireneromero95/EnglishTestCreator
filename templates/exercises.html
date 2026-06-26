@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Exercise Bank{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Exercise Bank</h1>
+    <p class="page-subtitle">All available exercises · {{ exercises|length }} total</p>
+  </div>
+</div>
+
+<!-- Category filter -->
+<div class="cat-filter" style="margin-bottom:1.5rem">
+  <button class="cat-btn active" data-cat="all">All</button>
+  {% for cat in categories %}
+  <button class="cat-btn" data-cat="{{ cat }}">{{ cat|capitalize }}</button>
+  {% endfor %}
+</div>
+
+<div class="exercise-grid" id="exercise-grid">
+  {% for ex in exercises %}
+  <div class="exercise-card" data-cat="{{ ex.category }}">
+    <div class="exercise-card-header">
+      <span class="badge badge-{{ ex.category }}">{{ ex.category }}</span>
+      <span class="badge badge-type">{{ ex.exercise_type.replace('_',' ') }}</span>
+      <span class="difficulty-dot diff-{{ ex.difficulty }}" title="{{ ex.difficulty }}">●</span>
+    </div>
+    <div class="exercise-card-title">{{ ex.title }}</div>
+    <div class="exercise-card-instr">{{ ex.instructions }}</div>
+
+    <div class="exercise-card-preview">
+      {% set c = ex.content %}
+      {% set etype = ex.exercise_type %}
+      {% if etype == 'multiple_choice' %}
+        <p class="preview-text">{{ c.question }}</p>
+        {% for opt in c.options %}
+        <div class="mc-option">{{ ['A','B','C','D'][loop.index0] }}) {{ opt }}</div>
+        {% endfor %}
+      {% elif etype == 'fill_in_the_blank' %}
+        <p class="preview-text">{{ c.sentence }}</p>
+      {% elif etype == 'error_correction' %}
+        <p class="preview-text">{{ c.sentence }}</p>
+      {% elif etype == 'sentence_transformation' %}
+        <p class="preview-text">{{ c.original }}</p>
+        <p class="preview-hint">Keyword: <strong>{{ c.keyword }}</strong></p>
+      {% endif %}
+    </div>
+
+    <div class="exercise-card-footer">
+      <span class="diff-label">{{ ex.difficulty }}</span>
+      <span class="ex-date">{{ ex.created_at.strftime('%d %b %Y') }}</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<script>
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const cat = btn.dataset.cat;
+    document.querySelectorAll('.exercise-card').forEach(card => {
+      card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+    });
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}{{ exam.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <a href="/" class="breadcrumb">← Dashboard</a>
+    <h1 class="page-title">{{ exam.title }}</h1>
+    <div class="exam-meta">
+      {% if exam.level %}<span class="badge badge-level">{{ exam.level }}</span>{% endif %}
+      <span class="exam-count">{{ exam.exam_exercises|length }} exercises</span>
+      <span class="exam-date">Created {{ exam.created_at.strftime('%d %b %Y') }}</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <a href="/api/exams/{{ exam.id }}/export/pdf" class="btn btn-outline">📄 Export PDF</a>
+    <a href="/api/exams/{{ exam.id }}/export/docx" class="btn btn-outline">📝 Export Word</a>
+  </div>
+</div>
+
+{% if exam.description %}
+<p class="exam-desc-block">{{ exam.description }}</p>
+{% endif %}
+
+<div class="two-col">
+
+  <!-- Left: exercises in exam -->
+  <div class="col-main">
+    <div class="card">
+      <div class="card-header">
+        Exercises in this Exam
+        <span class="badge-count">{{ exam.exam_exercises|length }}</span>
+      </div>
+      <div id="exam-exercises">
+        {% if exam.exam_exercises %}
+          {% for ee in exam.exam_exercises %}
+          <div class="exam-exercise-item" id="ex-row-{{ ee.exercise.id }}">
+            <div class="ex-num">{{ loop.index }}</div>
+            <div class="ex-info">
+              <div class="ex-header">
+                <span class="badge badge-{{ ee.exercise.category }}">{{ ee.exercise.category }}</span>
+                <span class="badge badge-type">{{ ee.exercise.exercise_type.replace('_',' ') }}</span>
+                <span class="difficulty-dot diff-{{ ee.exercise.difficulty }}" title="{{ ee.exercise.difficulty }}">●</span>
+              </div>
+              <div class="ex-title">{{ ee.exercise.title }}</div>
+              <div class="ex-instr">{{ ee.exercise.instructions }}</div>
+
+              <!-- Preview content -->
+              <div class="ex-preview">
+                {% set c = ee.exercise.content %}
+                {% set etype = ee.exercise.exercise_type %}
+                {% if etype == 'multiple_choice' %}
+                  <p class="preview-text">{{ c.question }}</p>
+                  {% for opt in c.options %}
+                  <div class="mc-option {% if loop.index == (c.answer|string)[0]|int %}mc-correct{% endif %}">
+                    {{ ['A','B','C','D'][loop.index0] }}) {{ opt }}
+                  </div>
+                  {% endfor %}
+                {% elif etype == 'fill_in_the_blank' %}
+                  <p class="preview-text">{{ c.sentence }}</p>
+                {% elif etype == 'error_correction' %}
+                  <p class="preview-text">{{ c.sentence }}</p>
+                  <p class="preview-answer">✓ Correction: {{ c.correction }}</p>
+                {% elif etype == 'sentence_transformation' %}
+                  <p class="preview-text">{{ c.original }}</p>
+                  <p class="preview-hint">Keyword: <strong>{{ c.keyword }}</strong></p>
+                  <p class="preview-answer">✓ {{ c.answer }}</p>
+                {% endif %}
+              </div>
+            </div>
+            <button class="remove-ex-btn" onclick="removeExercise({{ exam.id }}, {{ ee.exercise.id }})"
+                    title="Remove from exam">✕</button>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state" style="padding:2rem">
+            <div class="empty-title">No exercises yet</div>
+            <div class="empty-desc">Add exercises from the bank on the right.</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: add more exercises -->
+  <div class="col-side">
+    <div class="card">
+      <div class="card-header">Add Exercises</div>
+      <div class="card-body" style="padding-bottom:0">
+        <div class="cat-filter">
+          <button class="cat-btn active" data-cat="all">All</button>
+          <button class="cat-btn" data-cat="grammar">Grammar</button>
+          <button class="cat-btn" data-cat="vocabulary">Vocabulary</button>
+          <button class="cat-btn" data-cat="reading">Reading</button>
+          <button class="cat-btn" data-cat="writing">Writing</button>
+        </div>
+      </div>
+      <div id="exercise-picker" class="exercise-picker">
+        {% for ex in all_exercises %}
+        <div class="picker-item {% if ex.id in exam_exercise_ids %}in-exam{% endif %}"
+             data-id="{{ ex.id }}" data-cat="{{ ex.category }}"
+             onclick="addExercise({{ exam.id }}, {{ ex.id }}, this)">
+          <div class="picker-item-header">
+            <span class="badge badge-{{ ex.category }}">{{ ex.category }}</span>
+            <span class="badge badge-type">{{ ex.exercise_type.replace('_',' ') }}</span>
+          </div>
+          <div class="picker-item-title">{{ ex.title }}</div>
+          {% if ex.id in exam_exercise_ids %}
+          <div class="in-exam-label">Already in exam</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const cat = btn.dataset.cat;
+    document.querySelectorAll('.picker-item').forEach(item => {
+      item.style.display = (cat === 'all' || item.dataset.cat === cat) ? '' : 'none';
+    });
+  });
+});
+
+async function addExercise(examId, exerciseId, el) {
+  if (el.classList.contains('in-exam')) return;
+  const res = await fetch(`/api/exams/${examId}/exercises`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ exercise_id: exerciseId })
+  });
+  if (res.ok) location.reload();
+  else {
+    const err = await res.json();
+    alert(err.detail || 'Error adding exercise.');
+  }
+}
+
+async function removeExercise(examId, exerciseId) {
+  if (!confirm('Remove this exercise from the exam?')) return;
+  const res = await fetch(`/api/exams/${examId}/exercises/${exerciseId}`, {
+    method: 'DELETE'
+  });
+  if (res.ok) location.reload();
+  else alert('Error removing exercise.');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,1138 @@
+/* ─────────────────────────────────────────────────────────────
+   EDUDESK — Design tokens
+   Concepto: la hoja de examen corregida. Papel de cuaderno,
+   tinta de profesor, lápiz, y marcas reales de corrección
+   (caret de inserción, subrayado ondulado, pilcrow, "?" de margen)
+   en vez de iconografía genérica de SaaS.
+───────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,600;0,700;1,500&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root {
+  /* papel y tinta */
+  --paper: #eaeef1; /* fondo de página — hoja de respuestas */
+  --paper-grid: rgba(43, 60, 74, 0.055);
+  --sheet: #fbfcfc; /* superficie de tarjetas */
+  --sheet-edge: #cbd3d8;
+  --ink: #20262b; /* texto principal, tinta grafito */
+  --ink-soft: #5c6770; /* texto secundario, lápiz */
+  --ink-faint: #8a949c;
+
+  /* tinta de corrección */
+  --red-pen: #c81e3a;
+  --red-pen-deep: #9c1830;
+  --red-pen-bg: #fbeaec;
+
+  --stamp-green: #2e7d4f;
+  --stamp-green-bg: #e8f4ec;
+
+  /* marcadores fluorescentes por categoría */
+  --hl-grammar: #3567c9;
+  --hl-vocabulary: #129e92;
+  --hl-reading: #8854c0;
+  --hl-writing: #c99300;
+
+  --radius: 3px;
+  --radius-sm: 2px;
+  --shadow-sheet: 0 1px 0 var(--sheet-edge),
+    0 8px 20px -8px rgba(32, 38, 43, 0.18);
+  --sidebar-w: 232px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Reset & base
+───────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Public Sans', sans-serif;
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--paper-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-grid) 1px, transparent 1px);
+  background-size: 26px 26px;
+  color: var(--ink);
+  display: flex;
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--red-pen);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Sidebar
+───────────────────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sheet);
+  border-right: 1px solid var(--sheet-edge);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1.3rem 1.2rem;
+  border-bottom: 1px solid var(--sheet-edge);
+}
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-sm);
+  background: var(--sheet);
+  transform: rotate(-2deg);
+  flex-shrink: 0;
+}
+.brand-name {
+  font-family: 'Spectral', serif;
+  font-weight: 700;
+  font-size: 1.12rem;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.nav-links {
+  list-style: none;
+  padding: 0.9rem 0;
+  flex: 1;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 1.2rem;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.92rem;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.nav-link:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+.nav-link.active {
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 600;
+  border-left-color: var(--red-pen);
+}
+.nav-icon {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+.sidebar-footer {
+  padding: 1rem 1.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  border-top: 1px solid var(--sheet-edge);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Main content
+───────────────────────────────────────────────────────────── */
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 2.2rem 2.5rem;
+  max-width: 1200px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Page header
+───────────────────────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.9rem;
+  gap: 1rem;
+}
+.page-title {
+  font-family: 'Spectral', serif;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.page-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin-top: 0.4rem;
+}
+.breadcrumb {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+.breadcrumb::before {
+  content: '← ';
+}
+.breadcrumb:hover {
+  color: var(--red-pen);
+}
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Buttons — estampados, no botones de SaaS
+───────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.05rem;
+  border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s, border-color 0.15s,
+    transform 0.12s ease;
+}
+.btn-primary {
+  background: var(--ink);
+  color: var(--sheet);
+  border-color: var(--ink);
+}
+.btn-primary:hover {
+  background: var(--red-pen);
+  border-color: var(--red-pen);
+  transform: translateY(-1px);
+}
+.btn-outline {
+  background: var(--sheet);
+  border-color: var(--sheet-edge);
+  color: var(--ink);
+}
+.btn-outline:hover {
+  border-color: var(--ink);
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-soft);
+}
+.btn-ghost:hover {
+  color: var(--ink);
+  background: var(--paper);
+}
+.btn-danger {
+  background: transparent;
+  color: var(--red-pen);
+  border-color: var(--red-pen-bg);
+}
+.btn-danger:hover {
+  background: var(--red-pen);
+  color: #fff;
+  border-color: var(--red-pen);
+}
+.btn-sm {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.68rem;
+}
+.btn-full {
+  width: 100%;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Cards
+───────────────────────────────────────────────────────────── */
+.card {
+  background: var(--sheet);
+  border: 1px solid var(--sheet-edge);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sheet);
+  overflow: hidden;
+}
+.card-header {
+  padding: 0.9rem 1.2rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--sheet-edge);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.card-body {
+  padding: 1.25rem;
+}
+.card-footer {
+  padding: 0.85rem 1.2rem;
+  border-top: 1px solid var(--sheet-edge);
+  background: var(--paper);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Stats grid
+───────────────────────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.2rem;
+}
+.stat-card {
+  background: var(--sheet);
+  border: 1px solid var(--sheet-edge);
+  border-left: 4px solid var(--sheet-edge);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  position: relative;
+}
+.stat-card:has(.badge-grammar) {
+  border-left-color: var(--hl-grammar);
+}
+.stat-card:has(.badge-vocabulary) {
+  border-left-color: var(--hl-vocabulary);
+}
+.stat-card:has(.badge-reading) {
+  border-left-color: var(--hl-reading);
+}
+.stat-card:has(.badge-writing) {
+  border-left-color: var(--hl-writing);
+}
+
+.stat-value {
+  font-family: 'Spectral', serif;
+  font-size: 2.05rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin-top: 0.25rem;
+}
+.stat-badge {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.65;
+}
+/* En el rincón de stat-card no usamos el marcador fluorescente,
+   solo el color de tinta — evita competir con el borde izquierdo */
+.stat-badge.badge-grammar::before,
+.stat-badge.badge-grammar::after,
+.stat-badge.badge-vocabulary::before,
+.stat-badge.badge-vocabulary::after,
+.stat-badge.badge-reading::before,
+.stat-badge.badge-reading::after,
+.stat-badge.badge-writing::before,
+.stat-badge.badge-writing::after {
+  content: none;
+}
+.stat-badge.badge-grammar {
+  color: var(--hl-grammar);
+}
+.stat-badge.badge-vocabulary {
+  color: var(--hl-vocabulary);
+}
+.stat-badge.badge-reading {
+  color: var(--hl-reading);
+}
+.stat-badge.badge-writing {
+  color: var(--hl-writing);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Exam list
+───────────────────────────────────────────────────────────── */
+.section-title {
+  font-family: 'Spectral', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--ink);
+}
+.exam-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.exam-card {
+  background: var(--sheet);
+  border: 1px solid var(--sheet-edge);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-sheet);
+  position: relative;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.exam-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 1.1rem;
+  right: 1.1rem;
+  border-top: 1px dashed var(--sheet-edge);
+}
+.exam-card:hover {
+  border-color: var(--ink-faint);
+  box-shadow: 0 10px 26px -10px rgba(32, 38, 43, 0.24);
+}
+.exam-title {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  font-size: 1rem;
+}
+.exam-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.exam-count,
+.exam-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+.exam-desc {
+  font-size: 0.83rem;
+  color: var(--ink-soft);
+  margin-top: 0.35rem;
+}
+.exam-desc-block {
+  color: var(--ink-soft);
+  font-family: 'Spectral', serif;
+  font-style: italic;
+  font-size: 1.02rem;
+  margin-bottom: 1.5rem;
+}
+.exam-card-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Badges — marcas reales de corrección, no etiquetas de SaaS
+───────────────────────────────────────────────────────────── */
+.badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.16rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  z-index: 1;
+}
+.badge::after {
+  margin-right: 0.35em;
+  order: -1;
+  font-weight: 700;
+}
+
+/* el "trazo de marcador" detrás del texto */
+.badge-grammar::before,
+.badge-vocabulary::before,
+.badge-reading::before,
+.badge-writing::before {
+  content: '';
+  position: absolute;
+  inset: 12% -6%;
+  opacity: 0.3;
+  mix-blend-mode: multiply;
+  transform: rotate(-0.6deg);
+  border-radius: 1px;
+  z-index: -1;
+}
+.badge-grammar::before {
+  background: var(--hl-grammar);
+}
+.badge-vocabulary::before {
+  background: var(--hl-vocabulary);
+}
+.badge-reading::before {
+  background: var(--hl-reading);
+}
+.badge-writing::before {
+  background: var(--hl-writing);
+}
+
+/* la marca de corrección real, antepuesta vía flex order */
+.badge-grammar::after {
+  content: '‸';
+  color: var(--hl-grammar);
+} /* caret de inserción */
+.badge-vocabulary::after {
+  content: '〜';
+  color: var(--hl-vocabulary);
+} /* subrayado ondulado */
+.badge-reading::after {
+  content: '?';
+  color: var(--hl-reading);
+} /* "?" de margen */
+.badge-writing::after {
+  content: '¶';
+  color: var(--hl-writing);
+} /* pilcrow */
+
+.badge-type {
+  background: var(--sheet);
+  border: 1px solid var(--sheet-edge);
+  color: var(--ink-soft);
+}
+.badge-level {
+  background: var(--sheet);
+  border: 1px solid var(--stamp-green);
+  color: var(--stamp-green);
+}
+.badge-count {
+  background: var(--ink);
+  color: var(--sheet);
+  border-radius: 20px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.68rem;
+}
+
+/* punto de dificultad — marcas de lápiz */
+.difficulty-dot {
+  font-size: 0.75rem;
+}
+.diff-easy {
+  color: var(--stamp-green);
+}
+.diff-medium {
+  color: var(--hl-writing);
+}
+.diff-hard {
+  color: var(--red-pen);
+}
+.diff-label {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  text-transform: capitalize;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Tabs
+───────────────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 1.6rem;
+  border-bottom: 1px solid var(--sheet-edge);
+}
+.tab-btn {
+  padding: 0.6rem 1.05rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn.active {
+  color: var(--ink);
+  border-bottom-color: var(--red-pen);
+}
+.tab-panel.hidden {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Two-column layout
+───────────────────────────────────────────────────────────── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 1.5rem;
+  align-items: start;
+}
+.col-main {
+}
+.col-side {
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Form elements
+───────────────────────────────────────────────────────────── */
+.form-label {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  margin-bottom: 0.35rem;
+  margin-top: 1rem;
+}
+.form-label:first-child {
+  margin-top: 0;
+}
+.form-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid var(--sheet-edge);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: 'Public Sans', sans-serif;
+  color: var(--ink);
+  background: var(--sheet);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-input:focus {
+  outline: none;
+  border-color: var(--red-pen);
+  box-shadow: 0 0 0 3px var(--red-pen-bg);
+}
+.required {
+  color: var(--red-pen);
+}
+.form-error {
+  background: var(--red-pen-bg);
+  border: 1px solid var(--red-pen);
+  color: var(--red-pen-deep);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.84rem;
+  margin-top: 0.75rem;
+}
+.form-error.hidden {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Category filter
+───────────────────────────────────────────────────────────── */
+.cat-filter {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.cat-btn {
+  padding: 0.32rem 0.8rem;
+  border: 1.5px solid var(--sheet-edge);
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  background: var(--sheet);
+  color: var(--ink-soft);
+  transition: all 0.15s;
+}
+.cat-btn.active,
+.cat-btn:hover {
+  background: var(--ink);
+  color: var(--sheet);
+  border-color: var(--ink);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Exercise picker (sidebar list)
+───────────────────────────────────────────────────────────── */
+.exercise-picker {
+  max-height: 520px;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+.picker-item {
+  padding: 0.75rem;
+  border: 1.5px solid var(--sheet-edge);
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s;
+}
+.picker-item:hover {
+  border-color: var(--ink-faint);
+  background: var(--paper);
+}
+.picker-item.selected {
+  border-color: var(--red-pen);
+  background: var(--red-pen-bg);
+}
+.picker-item.in-exam {
+  opacity: 0.5;
+  cursor: default;
+}
+.picker-item-header {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+.picker-item-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+}
+.picker-item-instr {
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.picker-check {
+  display: none;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--red-pen);
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+}
+.picker-item.selected .picker-check {
+  display: flex;
+}
+.in-exam-label {
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  margin-top: 0.2rem;
+  font-style: italic;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Selected exercises list (manual builder)
+───────────────────────────────────────────────────────────── */
+.selected-list {
+  padding: 0.5rem;
+  min-height: 80px;
+}
+.empty-selected {
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  padding: 1rem;
+  text-align: center;
+}
+.selected-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--sheet-edge);
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.4rem;
+  background: var(--paper);
+}
+.selected-num {
+  width: 22px;
+  height: 22px;
+  background: var(--ink);
+  color: var(--sheet);
+  border-radius: 50%;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.selected-badge {
+  flex-shrink: 0;
+}
+.selected-title {
+  flex: 1;
+  font-size: 0.83rem;
+  font-weight: 500;
+}
+.remove-btn {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: var(--radius-sm);
+}
+.remove-btn:hover {
+  color: var(--red-pen);
+  background: var(--red-pen-bg);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Counters (auto-generate)
+───────────────────────────────────────────────────────────── */
+.divider-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 1.3rem 0 0.8rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--sheet-edge);
+}
+.counter-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.counter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--sheet-edge);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+.counter-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.counter-btn {
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--sheet-edge);
+  border-radius: var(--radius-sm);
+  background: var(--sheet);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.counter-btn:hover {
+  background: var(--ink);
+  color: var(--sheet);
+  border-color: var(--ink);
+}
+.counter-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Exam detail — exercises in exam
+───────────────────────────────────────────────────────────── */
+.exam-exercise-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--sheet-edge);
+  align-items: flex-start;
+}
+.exam-exercise-item:last-child {
+  border-bottom: none;
+}
+.ex-num {
+  width: 26px;
+  height: 26px;
+  background: var(--ink);
+  color: var(--sheet);
+  border-radius: 50%;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+.ex-info {
+  flex: 1;
+}
+.ex-header {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+.ex-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+.ex-instr {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+.ex-preview {
+  font-size: 0.85rem;
+}
+.remove-ex-btn {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+.remove-ex-btn:hover {
+  color: var(--red-pen);
+  background: var(--red-pen-bg);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Exercise preview
+───────────────────────────────────────────────────────────── */
+.preview-text {
+  margin-bottom: 0.45rem;
+  color: var(--ink);
+}
+.mc-option {
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.25rem;
+  background: var(--paper);
+  border-left: 3px solid transparent;
+  font-size: 0.85rem;
+}
+.mc-correct {
+  background: var(--stamp-green-bg);
+  border-left-color: var(--stamp-green);
+  color: var(--stamp-green);
+  font-weight: 600;
+}
+.mc-correct::before {
+  content: '✓ ';
+}
+.preview-answer {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--stamp-green);
+  margin-top: 0.35rem;
+}
+.preview-hint {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Exercise bank grid
+───────────────────────────────────────────────────────────── */
+.exercise-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+.exercise-card {
+  background: var(--sheet);
+  border: 1px solid var(--sheet-edge);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-sheet);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.exercise-card-header {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.exercise-card-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.exercise-card-instr {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.exercise-card-preview {
+  font-size: 0.83rem;
+  flex: 1;
+}
+.exercise-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.4rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--sheet-edge);
+}
+.ex-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Empty states — la hoja en blanco
+───────────────────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: var(--ink-soft);
+  border: 1.5px dashed var(--sheet-edge);
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+.empty-icon {
+  font-size: 2.3rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.8;
+}
+.empty-title {
+  font-family: 'Spectral', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ink);
+  margin-bottom: 0.35rem;
+}
+.empty-desc {
+  font-size: 0.85rem;
+  margin-bottom: 1.1rem;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Responsive
+───────────────────────────────────────────────────────────── */
+@media (max-width: 880px) {
+  body {
+    display: block;
+  }
+  .sidebar {
+    position: relative;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--sheet-edge);
+  }
+  .sidebar-brand {
+    border-bottom: none;
+    border-right: 1px solid var(--sheet-edge);
+  }
+  .nav-links {
+    display: flex;
+    padding: 0;
+    flex: 1;
+    overflow-x: auto;
+  }
+  .nav-link {
+    padding: 0.9rem 1rem;
+    border-left: none;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+  }
+  .nav-link.active {
+    border-left: none;
+    border-bottom-color: var(--red-pen);
+  }
+  .sidebar-footer {
+    display: none;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 1.5rem 1.25rem;
+    max-width: 100%;
+  }
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .stats-grid,
+  .exercise-grid {
+    grid-template-columns: 1fr;
+  }
+  .exam-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .exam-card-actions {
+    width: 100%;
+  }
+}

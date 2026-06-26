@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Exam Builder{% endblock %} · Barbie profe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,600;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body>
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">📝</span>
+        <span class="brand-name">English Test Creator</span>
+      </div>
+      <ul class="nav-links">
+        <li>
+          <a
+            href="/"
+            class="nav-link {% if request.url.path == '/' %}active{% endif %}"
+          >
+            <span class="nav-icon">🏠</span> Dashboard
+          </a>
+        </li>
+        <li>
+          <a
+            href="/exams/new"
+            class="nav-link {% if request.url.path == '/exams/new' %}active{% endif %}"
+          >
+            <span class="nav-icon">➕</span> New Exam
+          </a>
+        </li>
+        <li>
+          <!-- Corregir este link para que lleve a /excercises/new -->
+          <a
+            href="/exercises/new"
+            class="nav-link {% if request.url.path == '/exercises/new' %}active{% endif %}"
+          >
+            <span class="nav-icon">➕</span> New Exercise
+          </a>
+        </li>
+        <li>
+          <a
+            href="/exercises"
+            class="nav-link {% if request.url.path == '/exercises' %}active{% endif %}"
+          >
+            <span class="nav-icon">📚</span> Exercise Bank
+          </a>
+        </li>
+      </ul>
+      <div class="sidebar-footer">
+        <span>English Exam Builder</span>
+      </div>
+    </nav>
+
+    <main class="main-content">{% block content %}{% endblock %}</main>
+
+    <script src="/static/js/app.js"></script>
+    {% block extra_js %}{% endblock %}
+  </body>
+</html>
