@@ -1,5 +1,4 @@
 services:
-
   db:
     image: postgres:16-alpine
     container_name: exam_db
@@ -9,11 +8,11 @@ services:
       POSTGRES_PASSWORD: exampass
       POSTGRES_DB: exam_db
     volumes:
-      - postgres_data:/var/lib/postgresql/data   # datos persisten entre reinicios
+      - postgres_data:/var/lib/postgresql/data # datos persisten entre reinicios
     ports:
-      - "5432:5432"   # opcional: expone postgres por si quieres conectarte con DBeaver/pgAdmin
+      - '5432:5432' # opcional: expone postgres por si quieres conectarte con DBeaver/pgAdmin
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U examuser -d exam_db"]
+      test: ['CMD-SHELL', 'pg_isready -U examuser -d exam_db']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -22,15 +21,16 @@ services:
     build: .
     container_name: exam_app
     restart: unless-stopped
+    command: sh -c "python seed.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     environment:
       DATABASE_URL: postgresql://examuser:exampass@db:5432/exam_db
     ports:
-      - "8000:8000"
+      - '8000:8000'
     depends_on:
       db:
-        condition: service_healthy   # espera a que postgres esté listo antes de arrancar
+        condition: service_healthy # espera a que postgres esté listo antes de arrancar
     volumes:
-      - .:/app   # hot-reload: cambios en código se reflejan sin reconstruir
+      - .:/app # hot-reload: cambios en código se reflejan sin reconstruir
 
 volumes:
-  postgres_data:   # volumen nombrado → los datos de la BD sobreviven a "docker compose down"
+  postgres_data: # volumen nombrado → los datos de la BD sobreviven a "docker compose down"
