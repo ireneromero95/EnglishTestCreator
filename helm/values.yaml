@@ -11,7 +11,7 @@ service:
 
 ingress:
   enabled: true
-  host: englishtester.local
+  host: englishtestcreator.local
 
 postgresql:
   auth:
