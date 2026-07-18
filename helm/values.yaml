@@ -1,0 +1,24 @@
+replicaCount: 1
+
+image:
+  repository: ireneromero95/englishtester
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: true
+  host: englishtester.local
+
+postgresql:
+  auth:
+    username: examuser
+    password: exampass
+    database: exam_db
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi

@@ -36,21 +36,31 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
         cat.value: db.query(Exercise).filter(Exercise.category == cat).count()
         for cat in Category
     }
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
+    return templates.TemplateResponse(
+    request=request,
+    name="dashboard.html",
+    context={
         "exams": all_exams,
         "exercise_counts": exercise_counts,
-    })
+    },
+)
 
 
 @app.get("/exams/new")
 def new_exam_page(request: Request, db: Session = Depends(get_db)):
-    all_exercises = db.query(Exercise).order_by(Exercise.category, Exercise.title).all()
-    return templates.TemplateResponse("exam_create.html", {
-        "request": request,
-        "exercises": all_exercises,
-        "categories": [c.value for c in Category],
-    })
+    all_exercises = db.query(Exercise).order_by(
+        Exercise.category,
+        Exercise.title
+    ).all()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="exam_create.html",
+        context={
+            "exercises": all_exercises,
+            "categories": [c.value for c in Category],
+        },
+    )
 
 
 @app.get("/exams/{exam_id}")
@@ -61,33 +71,58 @@ def exam_detail_page(exam_id: int, request: Request, db: Session = Depends(get_d
         .filter(Exam.id == exam_id)
         .first()
     )
+
     if not exam:
-        return templates.TemplateResponse("404.html", {"request": request}, status_code=404)
+        return templates.TemplateResponse(
+            request=request,
+            name="404.html",
+            context={},
+            status_code=404,
+        )
 
-    all_exercises = db.query(Exercise).order_by(Exercise.category, Exercise.title).all()
-    exam_exercise_ids = {ee.exercise_id for ee in exam.exam_exercises}
+    all_exercises = db.query(Exercise).order_by(
+        Exercise.category,
+        Exercise.title
+    ).all()
 
-    return templates.TemplateResponse("exam_detail.html", {
-        "request": request,
-        "exam": exam,
-        "all_exercises": all_exercises,
-        "exam_exercise_ids": exam_exercise_ids,
-    })
+    exam_exercise_ids = {
+        ee.exercise_id for ee in exam.exam_exercises
+    }
+
+    return templates.TemplateResponse(
+        request=request,
+        name="exam_detail.html",
+        context={
+            "exam": exam,
+            "all_exercises": all_exercises,
+            "exam_exercise_ids": exam_exercise_ids,
+        },
+    )
 
 @app.get("/exercises/new")
 def new_exercise_page(request: Request):
-    return templates.TemplateResponse("exercise_create.html", {
-        "request": request,
-        "categories": [c.value for c in Category],
-        "exercise_types": [t.value for t in ExerciseType],
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="exercise_create.html",
+        context={
+            "categories": [c.value for c in Category],
+            "exercise_types": [t.value for t in ExerciseType],
+        },
+    )
 
 
 @app.get("/exercises")
 def exercises_page(request: Request, db: Session = Depends(get_db)):
-    all_exercises = db.query(Exercise).order_by(Exercise.category, Exercise.title).all()
-    return templates.TemplateResponse("exercises.html", {
-        "request": request,
-        "exercises": all_exercises,
-        "categories": [c.value for c in Category],
-    })
+    all_exercises = db.query(Exercise).order_by(
+        Exercise.category,
+        Exercise.title
+    ).all()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="exercises.html",
+        context={
+            "exercises": all_exercises,
+            "categories": [c.value for c in Category],
+        },
+    )
